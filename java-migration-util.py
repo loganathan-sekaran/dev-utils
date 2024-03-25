@@ -175,6 +175,7 @@ def migrateJavaFilesInModule(index, modulePath):
 def migrate():
     print(f"Migrating to Java 21")
     migratePoms()
+    migrateJavaFiles();
 
 def main():
 
