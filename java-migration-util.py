@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 from migration_config import modules_paths_list_in_order, git_base_dir, git_repos_in_order, branch
-from text_changes import pom_changes_dict, java_file_changes_dict
+from text_changes import pom_changes_dict, java_file_changes_dict, docker_file_changes_dict, push_trigger_changes_dict
 import argparse
 
 parser=argparse.ArgumentParser()
@@ -10,7 +10,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument("--mvnCleanInstall", "-mci", help="Maven Clean Install", nargs='?', const="True")
 parser.add_argument("--mvnCleanInstallSkipTests", "-mcist", help="Maven Clean Install with Skip tests and javadoc in build", nargs='?', const="True")
 parser.add_argument("--gitBaseDir", "-gbd", help="Git Base Directory", default=None)
-parser.add_argument("--addCommitAndPushToOrigin", "-cpo", help="Add changes, commit and push to origin", nargs='?', const="True")
+parser.add_argument("--addCommitAndPushToOrigin", "-acp", help="Add changes, commit and push to origin", nargs='?', const="True")
 parser.add_argument("--add", "-ad", help="Add changes", nargs='?', const="True")
 parser.add_argument("--commit", "-cm", help="Commit", nargs='?', const="True")
 parser.add_argument("--pushToOrigin", "-po", help="push to origin", nargs='?', const="True")
@@ -32,7 +32,7 @@ args=parser.parse_args()
 mvnBuildCommand = []
 
 gitAddAllCommand = ['git', 'add', '-u']
-gitCommitCommand = ['git', 'commit','--allow-empty', '-m', args.commitMessage]
+gitCommitCommand = ['git', 'commit', '-s', '--allow-empty', '-m', args.commitMessage]
 gitPushCommand = ['git', 'push', 'origin', branch]
 gitStatusCommand = ['git', 'status']
 gitDiffCommand = ['git', '--no-pager', 'diff']
@@ -170,12 +170,38 @@ def migrateJavaFilesInModule(index, modulePath):
     
     for key,value in java_file_changes_dict.items():
         replace_text_in_folder(moduleFullPath, key, value, ".java")
+        
+def migrateDockerFiles():
+    print(">>>>>>> Migrating Java Files")
+    for i, module in enumerate(modules_to_build):
+        migrateDockerFilesInModule(i, module)
+        
+def migrateDockerFilesInModule(index, modulePath):
+    print(">>>>>>> Migrating Docker files in module [" + str(index + 1) + "/" + str(len(modules_to_build))  + "]: " + modulePath)
+    moduleFullPath=getFullPath(modulePath)
+    
+    for key,value in docker_file_changes_dict.items():
+        replace_text_in_folder(moduleFullPath, key, value, "Dockerfile")
 
+
+def migratePushTriggerFiles():
+    print(">>>>>>> Migrating Java Files")
+    for i, module in enumerate(git_repos):
+        migratePushTriggerFilesInRepos(i, module)
+        
+def migratePushTriggerFilesInRepos(index, repoPath):
+    print(">>>>>>> Migrating push trigger files in git repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repoPath)
+    workflowFullPath=getFullPath(repoPath) + "/.github/workflows"
+    
+    for key,value in push_trigger_changes_dict.items():
+        replace_text_in_folder(workflowFullPath, key, value, ".yml")
 
 def migrate():
     print(f"Migrating to Java 21")
     migratePoms()
     migrateJavaFiles();
+    migrateDockerFiles();
+    migratePushTriggerFiles();
 
 def main():
 

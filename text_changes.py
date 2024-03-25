@@ -25,5 +25,21 @@ java_file_changes_dict={
 "javax.validation.ConstraintViolation" : "jakarta.validation.ConstraintViolation",
 "javax.validation.Validation" : "jakarta.validation.Validation",
 "javax.validation.Validator" : "jakarta.validation.Validator",
-"javax.validation.ValidatorFactory" : "jakarta.validation.ValidatorFactory"
+"javax.validation.ValidatorFactory" : "jakarta.validation.ValidatorFactory",
+
+"org.apache.http.impl.classic.HttpClientBuilder": "org.apache.hc.client5.http.impl.classic.HttpClientBuilder",
+"org.apache.http.impl.classic.HttpClients" : "org.apache.hc.client5.http.impl.classic.HttpClients",
+"org.apache.http.conn.ssl.SSLConnectionSocketFactory" : "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory"
+}
+
+docker_file_changes_dict= {
+
+"FROM openjdk:11"  : "FROM openjdk:21"
+
+}
+
+push_trigger_changes_dict= {
+
+"java-version: 11" : "java-version: 21"
+
 }
