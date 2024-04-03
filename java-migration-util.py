@@ -4,6 +4,7 @@ import sys
 from migration_config import modules_paths_list_in_order, git_base_dir, git_repos_in_order, branch
 from text_changes import pom_changes_dict, java_file_changes_dict, docker_file_changes_dict, push_trigger_changes_dict
 import argparse
+import pom_migrator
 
 parser=argparse.ArgumentParser()
 
@@ -130,23 +131,36 @@ def runCommand(command, moduleFullPath):
 
 # Function to replace text in a file
 def replace_text_in_file(file_path, old_text, new_text):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf8", errors="ignore") as file:
         filedata = file.read()
     filedata = filedata.replace(old_text, new_text)
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf8", errors="ignore") as file:
         file.write(filedata)
 
 def replace_text_in_folder(folder_path, old_text, new_text, file_extension):
-    # Iterate over all files in the folder
-    for filename in os.listdir(folder_path):
-        if filename.endswith(file_extension):
-            file_path = os.path.join(folder_path, filename)
-            # Check if it's a file
-            if os.path.isfile(file_path):
-                replace_text_in_file(file_path, old_text, new_text)
-
+    iterate_files_in_folder_and_apply(folder_path, file_extension, lambda file_path: replace_text_in_file(file_path, old_text, new_text))
     # Print a success message
     print(f"Replaced '{old_text}' with '{new_text}' in all '{file_extension}' files within '{folder_path}'.")
+
+def processPomsInFolder(folder_path):
+    iterate_files_in_folder_and_apply(folder_path, "pom.xml", lambda file_path: pom_migrator.addKernelBomToDependencyMgnt(file_path))
+    # Print a success message
+    print(f"Added kernel-bom dependency in all 'pom.xml' files within '{folder_path}'.")
+                
+def iterate_files_in_folder_and_apply(folder_path, file_extension, func):
+    # Iterate over all files in the folder
+    #print("Working on folder : " + folder_path + " for file ending with: " + file_extension)
+    for resname in os.listdir(folder_path):
+        res_path = os.path.join(folder_path, resname)
+        # Check if it's a file
+        if os.path.isfile(res_path):
+           # print("Located file: " + res_path)
+            if resname.endswith(file_extension):
+                #print("Working on file : " + res_path)
+                func(res_path)
+        elif os.path.isdir(res_path):
+            #print("Located folder : " + res_path)
+            iterate_files_in_folder_and_apply(res_path, file_extension, func)
 
 def migratePoms():
     print(">>>>>>> Migrating POMs")
@@ -158,6 +172,9 @@ def migratePomsInModule(index, modulePath):
     moduleFullPath=getFullPath(modulePath)
     for key,value in pom_changes_dict.items():
         replace_text_in_folder(moduleFullPath, key, value, "pom.xml")
+    
+    #processPomsInFolder(moduleFullPath)
+
 
 def migrateJavaFiles():
     print(">>>>>>> Migrating Java Files")

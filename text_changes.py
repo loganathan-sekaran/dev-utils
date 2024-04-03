@@ -2,39 +2,22 @@
 pom_changes_dict={
 "<maven.compiler.source>11</maven.compiler.source>" : "<maven.compiler.source>21</maven.compiler.source>",
 "<maven.compiler.target>11</maven.compiler.target>" : "<maven.compiler.target>21</maven.compiler.target>",
-"1.2.1-SNAPSHOT" : "1.2.1-java21-SNAPSHOT"
+"1.2.1-SNAPSHOT" : "1.2.1-java21-SNAPSHOT",
+"<jacoco.maven.plugin.version>0.8.5</jacoco.maven.plugin.version>" : "<jacoco.maven.plugin.version>0.8.11</jacoco.maven.plugin.version>"
 }
 
 java_file_changes_dict={
-"javax.servlet.http.HttpServletRequest" : "jakarta.servlet.http.HttpServletRequest",
-"javax.servlet.http.HttpServletRespons" : "jakarta.servlet.http.HttpServletResponse",
-"javax.servlet.http.ServletException" : "jakarta.servlet.http.ServletException",
-"javax.servlet.http.Cookie" : "jakarta.servlet.http.Cookie",
-"javax.servlet.FilterChain" : "jakarta.servlet.FilterChain",
-"javax.annotation.PostConstruct" : "jakarta.annotation.PostConstruct",
-"javax.activation.DataSource" : "jakarta.activation.DataSource",
-"javax.persistence.EntityManagerFactory" : "jakarta.persistence.EntityManagerFactory",
-
-"javax.persistence.Column" : "jakarta.persistence.Column",
-"javax.persistence.Entity" : "jakarta.persistence.Entity",
-"javax.persistence.Id" : "jakarta.persistence.Id",
-"javax.persistence.Table" : "jakarta.persistence.Table",
-"javax.validation.constraints.NotNull" : "jakarta.validation.constraints.NotNull",
-"javax.validation.constraints.Size" : "jakarta.validation.constraints.Size",
-
-"javax.validation.ConstraintViolation" : "jakarta.validation.ConstraintViolation",
-"javax.validation.Validation" : "jakarta.validation.Validation",
-"javax.validation.Validator" : "jakarta.validation.Validator",
-"javax.validation.ValidatorFactory" : "jakarta.validation.ValidatorFactory",
-
-"org.apache.http.impl.classic.HttpClientBuilder": "org.apache.hc.client5.http.impl.classic.HttpClientBuilder",
-"org.apache.http.impl.classic.HttpClients" : "org.apache.hc.client5.http.impl.classic.HttpClients",
-"org.apache.http.conn.ssl.SSLConnectionSocketFactory" : "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory"
+"javax.servlet." : "jakarta.servlet.",
+"javax.annotation." : "jakarta.annotation.",
+"javax.activation." : "jakarta.activation.",
+"javax.persistence." : "jakarta.persistence.",
+"javax.validation." : "jakarta.validation.",
+"org.apache.http.": "org.apache.hc.client5.http.",
 }
 
 docker_file_changes_dict= {
 
-"FROM openjdk:11"  : "FROM openjdk:21"
+"FROM openjdk:11"  : "FROM eclipse-temurin:21-jre",
 
 }
 
@@ -43,3 +26,13 @@ push_trigger_changes_dict= {
 "java-version: 11" : "java-version: 21"
 
 }
+
+kernel_bom_dependency_xml = """
+			<dependency>
+				<groupId>io.mosip.kernel</groupId>
+				<artifactId>kernel-bom</artifactId>
+				<version>1.2.1-java21-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+        """
