@@ -12,7 +12,11 @@ java_file_changes_dict={
 "javax.activation." : "jakarta.activation.",
 "javax.persistence." : "jakarta.persistence.",
 "javax.validation." : "jakarta.validation.",
-"org.apache.http.": "org.apache.hc.client5.http.",
+"javax.mail." : "jakarta.mail.",
+
+"org.apache.http.impl.client." : "org.apache.hc.client5.http.impl.classic.",
+"org.apache.http.conn.ssl.SSLConnectionSocketFactory" : "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory"
+
 }
 
 docker_file_changes_dict= {
