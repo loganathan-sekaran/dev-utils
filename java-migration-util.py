@@ -1,7 +1,7 @@
 import os
 import subprocess
 import sys
-from migration_config import modules_paths_list_in_order, git_base_dir, git_repos_in_order, branch
+from migration_config import modules_paths_list_in_order, git_base_dir, branch
 from text_changes import pom_changes_dict, java_file_changes_dict, docker_file_changes_dict, push_trigger_changes_dict
 import argparse
 import pom_migrator
@@ -18,8 +18,7 @@ parser.add_argument("--pushToOrigin", "-po", help="push to origin", nargs='?', c
 parser.add_argument("--commitMessage", "-m", help="Commit and push to origin", default='Committing changes.')
 parser.add_argument("--listModules", "-lsm", help="List Modules", nargs='?', const="True")
 parser.add_argument("--listGitRepos", "-lsr", help="List Git Repos", nargs='?', const="True")
-parser.add_argument("--moduleIndex", "-im", help="The index of module from which build to start", default=1, nargs='?', const="True")
-parser.add_argument("--repoIndex", "-ir", help="The index of repo from which related git action to start", default=1, nargs='?', const="True")
+parser.add_argument("--index", "-i", help="The index of module from which build to start", default=1, nargs='?', const="True")
 parser.add_argument("--migrate", "-mig", help="Migrate", nargs='?', const="True")
 
 parser.add_argument("--status", "-st", help="git status on all modules", nargs='?', const="True")
@@ -55,11 +54,33 @@ else:
 
 print("Git Base Directory: " + gitBaseDir)
 
-module_start_index=int(args.moduleIndex) - 1
+module_start_index=int(args.index) - 1
 modules_to_build=modules_paths_list_in_order[module_start_index::]
 
-repo_start_index=int(args.repoIndex) - 1
-git_repos=git_repos_in_order[repo_start_index::]
+
+def getGitRepos(modules_paths_list):
+    # Initialize an empty list to store distinct values in order
+    git_repos = []
+
+    # Initialize a set to keep track of seen values
+    seen_values = set()
+
+    # Iterate over each element in the list
+    for module_path in modules_paths_list:
+        # Split the element by '/'
+        parts = module_path.split('/')
+        # Get the first part
+        first_part = parts[0]
+        # If it's not seen before, add it to the list and set
+        if first_part not in seen_values:
+            git_repos.append(first_part)
+            seen_values.add(first_part)
+
+    # Return the list
+    return git_repos
+
+
+git_repos=getGitRepos(modules_to_build)
 
 
 def buildAll():
@@ -189,7 +210,7 @@ def migrateJavaFilesInModule(index, modulePath):
         replace_text_in_folder(moduleFullPath, key, value, ".java")
         
 def migrateDockerFiles():
-    print(">>>>>>> Migrating Java Files")
+    print(">>>>>>> Migrating Docker Files")
     for i, module in enumerate(modules_to_build):
         migrateDockerFilesInModule(i, module)
         
