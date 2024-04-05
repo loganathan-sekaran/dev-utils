@@ -21,7 +21,15 @@ java_file_changes_dict={
 
 docker_file_changes_dict= {
 
-"FROM openjdk:11"  : "FROM eclipse-temurin:21-jre",
+"FROM openjdk:11"  : "FROM eclipse-temurin:21-jre-alpine",
+"apt-get -y update" : "apk -q update",
+"apt-get update -y" : "apk -q update",
+"apt-get install -y" : "apk add -q",
+"apt-get -y install" : "apk add -q",
+"groupadd -g ${container_user_gid} ${container_user_group}" : 'addgroup -g ${container_user_gid} ${container_user_group}',
+"useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user}" : 'adduser -s /bin/sh -u ${container_user_uid} -G ${container_user_group} -h /home/${container_user} --disabled-password ${container_user}',
+
+'ARG container_user_uid=1001' : 'ARG container_user_uid=1002'
 
 }
 
@@ -40,3 +48,4 @@ kernel_bom_dependency_xml = """
 				<scope>import</scope>
 			</dependency>
         """
+        
