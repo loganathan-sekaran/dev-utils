@@ -36,8 +36,8 @@ docker_file_changes_dict= {
 push_trigger_changes_dict= {
 
 "java-version: 11" : "java-version: 21",
-"mosip/kattu/.github/workflows/maven-build.yml@master-java21" : "mosip/kattu/.github/workflows/maven-build.yml@master", # Added for having consistency for mutiple runs
-"mosip/kattu/.github/workflows/maven-build.yml@master" : "mosip/kattu/.github/workflows/maven-build.yml@master-java21"
+"@master-java21" : "@master", # Added for having consistency for mutiple runs
+"@master" : "@master-java21"
 
 }
 
