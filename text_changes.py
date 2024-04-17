@@ -11,13 +11,19 @@ java_file_changes_dict={
 "javax.annotation." : "jakarta.annotation.",
 "javax.activation." : "jakarta.activation.",
 "javax.persistence." : "jakarta.persistence.",
+"jakarta.persistence.jdbc.driver" : "javax.persistence.jdbc.driver",
+"jakarta.persistence.jdbc.url" : "javax.persistence.jdbc.url",
+"jakarta.persistence.jdbc.password" : "javax.persistence.jdbc.password",
+"jakarta.persistence.jdbc.schema" : "javax.persistence.jdbc.schema",
+"jakarta.persistence.jdbc.user" : "javax.persistence.jdbc.user",
+"jakarta.persistence.cache.storeMode" : "javax.persistence.cache.storeMode",
 "javax.validation." : "jakarta.validation.",
 "javax.mail." : "jakarta.mail.",
 
 "org.apache.http.impl.client." : "org.apache.hc.client5.http.impl.classic.",
 "org.apache.http.conn.ssl.SSLConnectionSocketFactory" : "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory",
 
-"org.hibernate.dialect.PostgreSQL95Dialect": "org.hibernate.dialect.PostgreSQLDialect",
+"org.hibernate.dialect.PostgreSQL95Dialect": "org.hibernate.dialect.PostgreSQLDialect", 
 "org.hibernate.dialect.PostgreSQL92Dialect": "org.hibernate.dialect.PostgreSQLDialect"
 
 }

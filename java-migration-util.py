@@ -12,6 +12,7 @@ parser.add_argument("--mvnCleanInstall", "-mci", help="Maven Clean Install", nar
 parser.add_argument("--mvnCleanInstallSkipTests", "-mcist", help="Maven Clean Install with Skip tests and javadoc in build", nargs='?', const="True")
 parser.add_argument("--gitBaseDir", "-gbd", help="Git Base Directory", default=None)
 parser.add_argument("--addCommitAndPushToOrigin", "-acp", help="Add changes, commit and push to origin", nargs='?', const="True")
+parser.add_argument("--fetchMerge", "-fm", help="Fetch upstream and merge develop-java21 branch", nargs='?', const="True")
 parser.add_argument("--add", "-ad", help="Add changes", nargs='?', const="True")
 parser.add_argument("--commit", "-cm", help="Commit", nargs='?', const="True")
 parser.add_argument("--pushToOrigin", "-po", help="push to origin", nargs='?', const="True")
@@ -36,6 +37,8 @@ gitCommitCommand = ['git', 'commit', '-s', '--allow-empty', '-m', args.commitMes
 gitPushCommand = ['git', 'push', 'origin', branch]
 gitStatusCommand = ['git', 'status']
 gitDiffCommand = ['git', '--no-pager', 'diff']
+gitFetchUpstreamCommand = ['git', 'fetch', 'upstream']
+gitMergeUpstreamJava21Command = ['git', 'merge', 'upstream/develop-java21']
 
 if args.mvnCleanInstall is not None:
     print("Maven Clean Install")
@@ -141,6 +144,16 @@ def gitDiffRepo(index, repo):
     print(">>>>>>> Diff of Repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repo)
     repoFullPath=getFullPath(repo)
     runCommand(gitDiffCommand, repoFullPath)
+
+def gitFetchMergeRepos():
+    for i, repo in enumerate(git_repos):
+        gitFetchMergeRepo(i, repo)
+    
+def gitFetchMergeRepo(index, repo):
+    print(">>>>>>> Git Fetch and Merge to develop-java21 branch for Repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repo)
+    repoFullPath=getFullPath(repo)
+    runCommand(gitFetchUpstreamCommand, repoFullPath)
+    runCommand(gitMergeUpstreamJava21Command, repoFullPath)
     
     
 def getFullPath(relativePath):
@@ -262,6 +275,9 @@ def main():
         args.pushToOrigin = True
         addCommitAndPushAll()
         print(">>>>>>> Commit and Push to Origin completed.")
+        
+    if args.fetchMerge is not None:
+        gitFetchMergeRepos()
         
     if args.listModules is not None:
         listModules()
