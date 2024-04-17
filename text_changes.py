@@ -15,7 +15,10 @@ java_file_changes_dict={
 "javax.mail." : "jakarta.mail.",
 
 "org.apache.http.impl.client." : "org.apache.hc.client5.http.impl.classic.",
-"org.apache.http.conn.ssl.SSLConnectionSocketFactory" : "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory"
+"org.apache.http.conn.ssl.SSLConnectionSocketFactory" : "org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory",
+
+"org.hibernate.dialect.PostgreSQL95Dialect": "org.hibernate.dialect.PostgreSQLDialect",
+"org.hibernate.dialect.PostgreSQL92Dialect": "org.hibernate.dialect.PostgreSQLDialect"
 
 }
 
@@ -25,6 +28,7 @@ docker_file_changes_dict= {
 "apt-get -y update" : "apk -q update",
 "apt-get update -y" : "apk -q update",
 "apt-get install -y" : "apk add -q",
+"apk add -q unzip \\" : "apk add -q unzip wget \\",
 "apt-get -y install" : "apk add -q",
 "groupadd -g ${container_user_gid} ${container_user_group}" : 'addgroup -g ${container_user_gid} ${container_user_group}',
 "useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user}" : 'adduser -s /bin/sh -u ${container_user_uid} -G ${container_user_group} -h /home/${container_user} --disabled-password ${container_user}',
