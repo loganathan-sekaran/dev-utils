@@ -19,7 +19,8 @@ parser.add_argument("--pushToOrigin", "-po", help="push to origin", nargs='?', c
 parser.add_argument("--commitMessage", "-m", help="Commit and push to origin", default='Committing changes.')
 parser.add_argument("--listModules", "-lsm", help="List Modules", nargs='?', const="True")
 parser.add_argument("--listGitRepos", "-lsr", help="List Git Repos", nargs='?', const="True")
-parser.add_argument("--index", "-i", help="The index of module from which build to start", default=1, nargs='?', const="True")
+parser.add_argument("--startIndex", "-si", help="The start index of module from which build to start", default=1, nargs='?', const="True")
+parser.add_argument("--index", "-i", help="The index of module from which specifically needs to be built", default=None, nargs='?', const="True")
 parser.add_argument("--migrate", "-mig", help="Migrate", nargs='?', const="True")
 
 parser.add_argument("--status", "-st", help="git status on all modules", nargs='?', const="True")
@@ -57,8 +58,12 @@ else:
 
 print("Git Base Directory: " + gitBaseDir)
 
-module_start_index=int(args.index) - 1
-modules_to_build=modules_paths_list_in_order[module_start_index::]
+if args.index is None:
+    module_start_index=int(args.startIndex) - 1
+    modules_to_build=modules_paths_list_in_order[module_start_index::]
+else:
+    index = int(args.index) - 1
+    modules_to_build=[modules_paths_list_in_order[index]]
 
 
 def getGitRepos(modules_paths_list):
