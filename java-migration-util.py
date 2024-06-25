@@ -1,9 +1,10 @@
 import os
 import subprocess
 import sys
-from migration_config import modules_paths_list_in_order, git_base_dir, git_repos_in_order, branch
+from migration_config import modules_paths_list_in_order, git_base_dir, branch
 from text_changes import pom_changes_dict, java_file_changes_dict, docker_file_changes_dict, push_trigger_changes_dict
 import argparse
+import pom_migrator
 
 parser=argparse.ArgumentParser()
 
@@ -11,14 +12,15 @@ parser.add_argument("--mvnCleanInstall", "-mci", help="Maven Clean Install", nar
 parser.add_argument("--mvnCleanInstallSkipTests", "-mcist", help="Maven Clean Install with Skip tests and javadoc in build", nargs='?', const="True")
 parser.add_argument("--gitBaseDir", "-gbd", help="Git Base Directory", default=None)
 parser.add_argument("--addCommitAndPushToOrigin", "-acp", help="Add changes, commit and push to origin", nargs='?', const="True")
+parser.add_argument("--fetchMerge", "-fm", help="Fetch upstream and merge develop-java21 branch", nargs='?', const="True")
 parser.add_argument("--add", "-ad", help="Add changes", nargs='?', const="True")
 parser.add_argument("--commit", "-cm", help="Commit", nargs='?', const="True")
 parser.add_argument("--pushToOrigin", "-po", help="push to origin", nargs='?', const="True")
 parser.add_argument("--commitMessage", "-m", help="Commit and push to origin", default='Committing changes.')
 parser.add_argument("--listModules", "-lsm", help="List Modules", nargs='?', const="True")
 parser.add_argument("--listGitRepos", "-lsr", help="List Git Repos", nargs='?', const="True")
-parser.add_argument("--moduleIndex", "-im", help="The index of module from which build to start", default=1, nargs='?', const="True")
-parser.add_argument("--repoIndex", "-ir", help="The index of repo from which related git action to start", default=1, nargs='?', const="True")
+parser.add_argument("--startIndex", "-si", help="The start index of module from which build to start", default=1, nargs='?', const="True")
+parser.add_argument("--index", "-i", help="The index of module from which specifically needs to be built", default=None, nargs='?', const="True")
 parser.add_argument("--migrate", "-mig", help="Migrate", nargs='?', const="True")
 
 parser.add_argument("--status", "-st", help="git status on all modules", nargs='?', const="True")
@@ -36,6 +38,8 @@ gitCommitCommand = ['git', 'commit', '-s', '--allow-empty', '-m', args.commitMes
 gitPushCommand = ['git', 'push', 'origin', branch]
 gitStatusCommand = ['git', 'status']
 gitDiffCommand = ['git', '--no-pager', 'diff']
+gitFetchUpstreamCommand = ['git', 'fetch', 'upstream']
+gitMergeUpstreamJava21Command = ['git', 'merge', 'upstream/develop-java21']
 
 if args.mvnCleanInstall is not None:
     print("Maven Clean Install")
@@ -54,11 +58,37 @@ else:
 
 print("Git Base Directory: " + gitBaseDir)
 
-module_start_index=int(args.moduleIndex) - 1
-modules_to_build=modules_paths_list_in_order[module_start_index::]
+if args.index is None:
+    module_start_index=int(args.startIndex) - 1
+    modules_to_build=modules_paths_list_in_order[module_start_index::]
+else:
+    index = int(args.index) - 1
+    modules_to_build=[modules_paths_list_in_order[index]]
 
-repo_start_index=int(args.repoIndex) - 1
-git_repos=git_repos_in_order[repo_start_index::]
+
+def getGitRepos(modules_paths_list):
+    # Initialize an empty list to store distinct values in order
+    git_repos = []
+
+    # Initialize a set to keep track of seen values
+    seen_values = set()
+
+    # Iterate over each element in the list
+    for module_path in modules_paths_list:
+        # Split the element by '/'
+        parts = module_path.split('/')
+        # Get the first part
+        first_part = parts[0]
+        # If it's not seen before, add it to the list and set
+        if first_part not in seen_values:
+            git_repos.append(first_part)
+            seen_values.add(first_part)
+
+    # Return the list
+    return git_repos
+
+
+git_repos=getGitRepos(modules_to_build)
 
 
 def buildAll():
@@ -119,6 +149,16 @@ def gitDiffRepo(index, repo):
     print(">>>>>>> Diff of Repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repo)
     repoFullPath=getFullPath(repo)
     runCommand(gitDiffCommand, repoFullPath)
+
+def gitFetchMergeRepos():
+    for i, repo in enumerate(git_repos):
+        gitFetchMergeRepo(i, repo)
+    
+def gitFetchMergeRepo(index, repo):
+    print(">>>>>>> Git Fetch and Merge to develop-java21 branch for Repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repo)
+    repoFullPath=getFullPath(repo)
+    runCommand(gitFetchUpstreamCommand, repoFullPath)
+    runCommand(gitMergeUpstreamJava21Command, repoFullPath)
     
     
 def getFullPath(relativePath):
@@ -130,23 +170,36 @@ def runCommand(command, moduleFullPath):
 
 # Function to replace text in a file
 def replace_text_in_file(file_path, old_text, new_text):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf8", errors="ignore") as file:
         filedata = file.read()
     filedata = filedata.replace(old_text, new_text)
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf8", errors="ignore") as file:
         file.write(filedata)
 
 def replace_text_in_folder(folder_path, old_text, new_text, file_extension):
-    # Iterate over all files in the folder
-    for filename in os.listdir(folder_path):
-        if filename.endswith(file_extension):
-            file_path = os.path.join(folder_path, filename)
-            # Check if it's a file
-            if os.path.isfile(file_path):
-                replace_text_in_file(file_path, old_text, new_text)
-
+    iterate_files_in_folder_and_apply(folder_path, file_extension, lambda file_path: replace_text_in_file(file_path, old_text, new_text))
     # Print a success message
     print(f"Replaced '{old_text}' with '{new_text}' in all '{file_extension}' files within '{folder_path}'.")
+
+def processPomsInFolder(folder_path):
+    iterate_files_in_folder_and_apply(folder_path, "pom.xml", lambda file_path: pom_migrator.addKernelBomToDependencyMgnt(file_path))
+    # Print a success message
+    print(f"Added kernel-bom dependency in all 'pom.xml' files within '{folder_path}'.")
+                
+def iterate_files_in_folder_and_apply(folder_path, file_extension, func):
+    # Iterate over all files in the folder
+    #print("Working on folder : " + folder_path + " for file ending with: " + file_extension)
+    for resname in os.listdir(folder_path):
+        res_path = os.path.join(folder_path, resname)
+        # Check if it's a file
+        if os.path.isfile(res_path):
+           # print("Located file: " + res_path)
+            if resname.endswith(file_extension):
+                #print("Working on file : " + res_path)
+                func(res_path)
+        elif os.path.isdir(res_path):
+            #print("Located folder : " + res_path)
+            iterate_files_in_folder_and_apply(res_path, file_extension, func)
 
 def migratePoms():
     print(">>>>>>> Migrating POMs")
@@ -158,6 +211,9 @@ def migratePomsInModule(index, modulePath):
     moduleFullPath=getFullPath(modulePath)
     for key,value in pom_changes_dict.items():
         replace_text_in_folder(moduleFullPath, key, value, "pom.xml")
+    
+    #processPomsInFolder(moduleFullPath)
+
 
 def migrateJavaFiles():
     print(">>>>>>> Migrating Java Files")
@@ -172,7 +228,7 @@ def migrateJavaFilesInModule(index, modulePath):
         replace_text_in_folder(moduleFullPath, key, value, ".java")
         
 def migrateDockerFiles():
-    print(">>>>>>> Migrating Java Files")
+    print(">>>>>>> Migrating Docker Files")
     for i, module in enumerate(modules_to_build):
         migrateDockerFilesInModule(i, module)
         
@@ -224,6 +280,9 @@ def main():
         args.pushToOrigin = True
         addCommitAndPushAll()
         print(">>>>>>> Commit and Push to Origin completed.")
+        
+    if args.fetchMerge is not None:
+        gitFetchMergeRepos()
         
     if args.listModules is not None:
         listModules()
