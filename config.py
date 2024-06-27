@@ -6,4 +6,9 @@ modules_paths_list_in_order = [
         "bio-extractor/bio-extractor"
 
 ]
-branch=''
+origin_remote='origin'
+upstream_remote='origin'
+
+origin_branch='loga-deveop'
+upstream_branch='develop'
+

@@ -3,7 +3,7 @@ import subprocess
 import os
 
 from common_util import CommonUtil
-from config import branch
+from config import origin_branch,origin_remote, upstream_remote, upstream_branch
 
 parser=argparse.ArgumentParser()
 
@@ -40,14 +40,17 @@ mvnBuildCommand = []
 
 gitAddAllCommand = ['git', 'add', '-u']
 gitCommitCommand = ['git', 'commit', '-s', '--allow-empty', '-m', args.commitMessage]
-if branch is not None:
-    gitPushCommand =  ['git', 'push', 'origin', branch]
+
+if origin_branch is not None:
+    gitPushCommand =  ['git', 'push', origin_remote, 'HEAD:' + origin_branch]
 else:
-    gitPushCommand =  ['git', 'push', 'origin']
+    gitPushCommand =  ['git', 'push', origin_remote, 'HEAD']
+    
+
 gitStatusCommand = ['git', 'status']
 gitDiffCommand = ['git', '--no-pager', 'diff']
-gitFetchUpstreamCommand = ['git', 'fetch', 'upstream']
-gitMergeUpstreamJava21Command = ['git', 'merge', 'upstream/develop-java21']  
+gitFetchUpstreamCommand = ['git', 'fetch', upstream_remote]
+gitMergeUpstreamJava21Command = ['git', 'merge', upstream_remote+'/' + upstream_branch]  
 
 
 
