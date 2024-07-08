@@ -41,7 +41,7 @@ else:
 
 mvnBuildCommand = []
 
-gitAddModifiledCommand = ['git', 'add', '-u']
+gitAddModifiedCommand = ['git', 'add', '-u']
 gitAddAllCommand = ['git', 'add', '-A']
 gitCommitCommand = ['git', 'commit', '-s', '--allow-empty', '-m', args.commitMessage]
 
@@ -71,9 +71,9 @@ def addCommitAndPushRepo(index, repo):
     print(">>>>>>> Working on repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repo)
     repoFullPath=getFullPath(repo)
     
-    if args.addModifiled is not None:
+    if args.addModified is not None:
         print("Adding all tracked changes")
-        runCommand(gitAddModifiledCommand, repoFullPath)
+        runCommand(gitAddModifiedCommand, repoFullPath)
         
     if args.addAll is not None:
         print("Adding all tracked and untracked changes")
