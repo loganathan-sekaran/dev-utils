@@ -24,6 +24,7 @@ parser.add_argument("--index", "-i", help="The index of module from which specif
 parser.add_argument("--status", "-st", help="git status on all modules", nargs='?', const="True")
 
 parser.add_argument("--diff", "-df", help="git diff on all modules", nargs='?', const="True")
+parser.add_argument("--cdToRepoIndex", "-cdi", help="Command to change directory to the repo index", nargs='?', const="True")
 
 
 
@@ -126,6 +127,11 @@ def runCommand(command, moduleFullPath):
 def main():
 
     print("Args: " + str(args))
+    
+    if args.cdToRepoIndex is not None:
+        repo = git_repos[int(args.cdToRepoIndex) - 1]
+        repoFullPath = getFullPath(repo)
+        print(">cd " + repoFullPath)
 
     if args.addModified is not None or args.addAll is not None or args.commit is not None or args.pushToOrigin is not None:
         addCommitAndPushAll()
