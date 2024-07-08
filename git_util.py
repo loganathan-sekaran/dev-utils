@@ -8,9 +8,11 @@ from config import origin_branch,origin_remote, upstream_remote, upstream_branch
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--gitBaseDir", "-gbd", help="Git Base Directory", default=None)
-parser.add_argument("--addCommitAndPushToOrigin", "-acp", help="Add changes, commit and push to origin", nargs='?', const="True")
+parser.add_argument("--addModifiedCommitAndPushToOrigin", "-amcp", help="Add changes, commit and push to origin", nargs='?', const="True")
+parser.add_argument("--addAllCommitAndPushToOrigin", "-aacp", help="Add changes, commit and push to origin", nargs='?', const="True")
 parser.add_argument("--fetchMerge", "-fm", help="Fetch upstream and merge develop-java21 branch", nargs='?', const="True")
-parser.add_argument("--add", "-ad", help="Add changes", nargs='?', const="True")
+parser.add_argument("--addModified", "-adm", help="Add modified files", nargs='?', const="True")
+parser.add_argument("--addAll", "-ada", help="Add all tracked and untracked files", nargs='?', const="True")
 parser.add_argument("--commit", "-cm", help="Commit", nargs='?', const="True")
 parser.add_argument("--pushToOrigin", "-po", help="push to origin", nargs='?', const="True")
 parser.add_argument("--commitMessage", "-m", help="Commit and push to origin", default='Committing changes.')
@@ -38,7 +40,8 @@ else:
 
 mvnBuildCommand = []
 
-gitAddAllCommand = ['git', 'add', '-u']
+gitAddModifiledCommand = ['git', 'add', '-u']
+gitAddAllCommand = ['git', 'add', '-A']
 gitCommitCommand = ['git', 'commit', '-s', '--allow-empty', '-m', args.commitMessage]
 
 if origin_branch is not None:
@@ -67,8 +70,12 @@ def addCommitAndPushRepo(index, repo):
     print(">>>>>>> Working on repo [" + str(index + 1) + "/" + str(len(git_repos))  + "]: " + repo)
     repoFullPath=getFullPath(repo)
     
-    if args.add is not None:
+    if args.addModifiled is not None:
         print("Adding all tracked changes")
+        runCommand(gitAddModifiledCommand, repoFullPath)
+        
+    if args.addAll is not None:
+        print("Adding all tracked and untracked changes")
         runCommand(gitAddAllCommand, repoFullPath)
     
     if args.commit is not None:
@@ -120,16 +127,23 @@ def main():
 
     print("Args: " + str(args))
 
-    if args.add is not None or args.commit is not None or args.pushToOrigin is not None:
+    if args.addModified is not None or args.addAll is not None or args.commit is not None or args.pushToOrigin is not None:
         addCommitAndPushAll()
         print(">>>>>>> Commit completed.")
     
-    if args.addCommitAndPushToOrigin is not None:
-        args.add = True
+    if args.addModifiedCommitAndPushToOrigin is not None:
+        args.addModified = True
         args.commit = True
         args.pushToOrigin = True
         addCommitAndPushAll()
-        print(">>>>>>> Commit and Push to Origin completed.")
+        print(">>>>>>> Add modified files Commit and Push to Origin completed.")
+        
+    if args.addAllCommitAndPushToOrigin is not None:
+        args.addAll = True
+        args.commit = True
+        args.pushToOrigin = True
+        addCommitAndPushAll()
+        print(">>>>>>> Add all tracked and untracked files, Commit and Push to Origin completed.")
         
     if args.fetchMerge is not None:
         gitFetchMergeRepos()
