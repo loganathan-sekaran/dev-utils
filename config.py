@@ -3,7 +3,8 @@ modules_paths_list_in_order = [
 
 		"bio-commons/bio-commons",
         "bio-matcher/bio-matcher",
-        "bio-extractor/bio-extractor"
+        "bio-extractor/bio-extractor",
+        "biosdk-service/biosdk-services"
 
 ]
 origin_remote='origin'
