@@ -1,4 +1,5 @@
 import subprocess
+import os
 from config import git_base_dir,modules_paths_list_in_order
 
 class CommonUtil:
@@ -17,8 +18,13 @@ class CommonUtil:
             index = int(args.index) - 1
             self.modules_to_build=[modules_paths_list_in_order[index]]
             
-        self.gitRepos=self.getGitRepos(self.modules_to_build)
+        self.gitRepos=set(self.getGitRepos(self.modules_to_build))
+        self.modules_to_build = set([m for m in self.modules_to_build if self.check_pom_exists(m)])
         
+        
+    def check_pom_exists(self, module_path):
+        pom_path = (self.gitBaseDir+ '/' + module_path + "/" + 'pom.xml').replace('\\', '/')
+        return os.path.isfile(pom_path)
 
             
     def getGitRepos(self, modules_paths_list):
