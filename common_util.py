@@ -1,6 +1,8 @@
 import subprocess
 import os
 from config import git_base_dir,modules_paths_list_in_order
+from collections import OrderedDict
+
 
 class CommonUtil:
     def __init__(self, args):
@@ -19,7 +21,7 @@ class CommonUtil:
             self.modules_to_build=[modules_paths_list_in_order[index]]
             
         self.gitRepos=set(self.getGitRepos(self.modules_to_build))
-        self.modules_to_build = set([m for m in self.modules_to_build if self.check_pom_exists(m)])
+        self.modules_to_build = list(OrderedDict.fromkeys([m for m in self.modules_to_build if self.check_pom_exists(m)]))
         
         
     def check_pom_exists(self, module_path):
