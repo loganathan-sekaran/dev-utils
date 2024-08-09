@@ -38,13 +38,6 @@ else:
 
 print("Git Base Directory: " + gitBaseDir)
 
-if args.index is None:
-    module_start_index=int(args.startIndex) - 1
-    modules_to_build=modules_paths_list_in_order[module_start_index::]
-else:
-    index = int(args.index) - 1
-    modules_to_build=[modules_paths_list_in_order[index]]
-
 def buildAll():
     for i, module in enumerate(modules_to_build):
         buildModule(i, module)
