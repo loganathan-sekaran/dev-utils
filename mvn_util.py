@@ -10,7 +10,7 @@ parser.add_argument("--mvnCleanInstall", "-mci", help="Maven Clean Install", nar
 parser.add_argument("--mvnCleanInstallSkipTests", "-mcist", help="Maven Clean Install with Skip tests and javadoc in build", nargs='?', const="True")
 parser.add_argument("--listModules", "-lsm", help="List Modules", nargs='?', const="True")
 parser.add_argument("--startIndex", "-si", help="The start index of module from which build to start", default=1, nargs='?', const="True")
-parser.add_argument("--index", "-i", help="The index of module from which specifically needs to be built", default=None, nargs='?', const="True")
+parser.add_argument("--index", "-i", help="The comma separated indices of module from which specifically needs to be built", default=None, nargs='?', const="True")
 
 
 args=parser.parse_args()

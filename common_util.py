@@ -17,8 +17,8 @@ class CommonUtil:
             module_start_index=int(args.startIndex) - 1
             self.modules_to_build=modules_paths_list_in_order[module_start_index::]
         else:
-            index = int(args.index) - 1
-            self.modules_to_build=[modules_paths_list_in_order[index]]
+            indices = [int(num) for num in args.index.split(',')]
+            self.modules_to_build=[modules_paths_list_in_order[index - 1] for index in indices]
             
         self.gitRepos=set(self.getGitRepos(self.modules_to_build))
         self.modules_to_build = list(OrderedDict.fromkeys([m for m in self.modules_to_build if self.check_pom_exists(m)]))
