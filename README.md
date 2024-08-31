@@ -4,6 +4,7 @@
 * This also contains “migarte-util” that will help the effort needed in Java 21 migration by automating many textual changes in the Java 11 code in Springboot applications.
 
 ## mvn_util Usage:
+````
 mvn_util.py [-h] [--gitBaseDir GITBASEDIR]
                    [--mvnCleanInstall [MVNCLEANINSTALL]]
                    [--mvnCleanInstallSkipTests [MVNCLEANINSTALLSKIPTESTS]]
@@ -26,8 +27,10 @@ options:
   --index [INDEX], -i [INDEX]
                         The comma separated indices of module from which
                         specifically needs to be built
+````
 
 ## git-util Usage:
+````
 git_util.py [-h] [--gitBaseDir GITBASEDIR]
                    [--addModifiedCommitAndPushToOrigin [ADDMODIFIEDCOMMITANDPUSHTOORIGIN]]
                    [--addAllCommitAndPushToOrigin [ADDALLCOMMITANDPUSHTOORIGIN]]
@@ -75,6 +78,7 @@ options:
                         git diff on all modules
   --cdToRepoIndex [CDTOREPOINDEX], -cdi [CDTOREPOINDEX]
                         Command to change directory to the repo index
+````
 
 ## migrate-util Usage:
 ````
